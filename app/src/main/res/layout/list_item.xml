@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+<android.support.v7.widget.AppCompatImageView
+    android:id="@+id/img_actorimage"
+    android:layout_width="100dp"
+    android:layout_height="150dp"
+    android:layout_margin="5dp"
+    android:src="@android:drawable/ic_dialog_info"/>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/tv_actorname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="name"
+        android:textSize="25sp"
+        android:layout_gravity="end"
+        android:textAlignment="viewEnd"
+        />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/tv_actorcountry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="country"
+        android:textSize="15sp"
+        android:layout_gravity="end"
+        android:textAlignment="viewEnd"
+        />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/tv_actordob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="dob"
+        android:textSize="15sp"
+        android:layout_gravity="end"
+        android:textAlignment="viewEnd"
+        />
+
+</LinearLayout>
+
+</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.7dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        android:background="#000000"
+        android:layout_marginBottom="2dp"
+        />
+
+</LinearLayout>
