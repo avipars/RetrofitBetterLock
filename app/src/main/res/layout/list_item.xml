@@ -47,6 +47,16 @@
         android:layout_gravity="end"
         android:textAlignment="viewEnd"
         />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/tv_actorgender"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="gender"
+        android:textSize="15sp"
+        android:layout_gravity="end"
+        android:textAlignment="viewEnd"
+        />
 
 </LinearLayout>
 
