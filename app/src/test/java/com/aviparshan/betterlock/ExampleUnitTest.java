@@ -1,4 +1,4 @@
-package com.androtechlayup.retrofitsample;
+package com.aviparshan.betterlock;
 
 import org.junit.Test;
 

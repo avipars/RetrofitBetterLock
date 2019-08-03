@@ -1,4 +1,4 @@
-package com.androtechlayup.retrofitsample;
+package com.aviparshan.betterlock;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.androtechlayup.retrofitsample", appContext.getPackageName());
+        assertEquals("com.aviparshan.betterlock", appContext.getPackageName());
     }
 }
