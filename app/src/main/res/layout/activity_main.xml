@@ -11,13 +11,11 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="?attr/actionBarSize"
-         />
+        android:layout_marginTop="?attr/actionBarSize" />
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/recyclerview"
-        android:layout_margin="5dp">
-
+        android:layout_margin="0.5dp">
     </android.support.v7.widget.RecyclerView>
 </LinearLayout>

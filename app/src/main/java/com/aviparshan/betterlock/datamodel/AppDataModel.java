@@ -16,6 +16,9 @@ public class AppDataModel {
     @SerializedName("package")
     @Expose
     private String packageName;
+    @SerializedName("activity")
+    @Expose
+    private String activity;
     @SerializedName("version")
     @Expose
     private String version;
@@ -25,6 +28,23 @@ public class AppDataModel {
     @SerializedName("icon")
     @Expose
     private String icon;
+
+    public AppDataModel(String title, String packageName, String activity, String version, String description, String icon) {
+        this.title = title;
+        this.packageName = packageName;
+        this.activity = activity;
+        this.version = version;
+        this.description = description;
+        this.icon = icon;
+    }
+
+    public String getActivity() {
+        return activity;
+    }
+
+    public void setActivity(String activity) {
+        this.activity = activity;
+    }
 
     public String getTitle() {
         return title;
@@ -37,6 +57,7 @@ public class AppDataModel {
     public String getPackageName() {
         return packageName;
     }
+
     public void setPackageName(String packageName) {
         this.packageName = packageName;
     }

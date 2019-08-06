@@ -10,6 +10,13 @@ public class ServiceGenerator {
     private static Retrofit retrofit;
     private static Gson gson;
 
+//    int cacheSize = 10 * 1024 * 1024; // 10 MB
+//    Cache cache = new Cache(this.getCacheDir(), cacheSize);
+//
+//    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+//            .cache(cache)
+//            .build();
+
     public static Retrofit getRetrofit() {
         gson=new GsonBuilder()
                 .create();

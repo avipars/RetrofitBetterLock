@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relative"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    tools:targetApi="m">
+    <!-- grid items for RecyclerView -->
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/image"
+        android:layout_width="55dp"
+        android:layout_height="60dp"
+        android:adjustViewBounds="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:scaleType="fitXY"
+        android:src="@android:drawable/ic_dialog_info"
+        tools:ignore="ContentDescription" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/tv_actorname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/image"
+        android:textSize="15sp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom|center"
+        android:text="Title" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_below="@id/tv_actorname"
+        android:id="@+id/tv_actordob"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_margin="5dp"
+        android:text="Version"
+        android:textAlignment="viewStart"
+        android:textSize="15sp" />
+</RelativeLayout>
