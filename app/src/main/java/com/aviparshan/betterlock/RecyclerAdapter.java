@@ -2,18 +2,23 @@ package com.aviparshan.betterlock;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.aviparshan.betterlock.datamodel.AppDataModel;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
@@ -59,14 +64,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         appDataModel = appDataModels.get(i);
         viewHolder.tv_actorname.setText(appDataModel.getTitle());
         viewHolder.tv_actorcountry.setText(appDataModel.getDescription());
-
         viewHolder.tv_actorgender.setText(appDataModel.getVersion());
-
         viewHolder.tv_actordateofbirth.setText(appDataModel.getPackageName());
-
         String url = appDataModel.getIcon();
 
-        final int position = i;
 
         Picasso.with(context)
                 .load(url)
@@ -79,6 +80,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         viewHolder.setIsRecyclable(false);
 
+        final int position = i;
+
         viewHolder.main.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,10 +92,46 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         viewHolder.main.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                listener.itemDetailClick(appDataModels.get(position));
-                return true;
+                listenerLong.itemDetailLongClick(appDataModels.get(position));
+                return pop(v, position);
             }
         });
+    }
+
+    boolean pop(View v, final int position)
+    {
+        PopupMenu popup = new PopupMenu(v.getContext(), v);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.unin:
+                        Main.uninstallApp(appDataModels.get(position));
+                        return true;
+                    case R.id.info:
+                        Main.appInfo(appDataModels.get(position));
+                        return true;
+                    case R.id.home:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        // here you can inflate your menu
+        popup.inflate(R.menu.context_menu);
+        popup.setGravity(Gravity.START);
+
+        // if you want icon with menu items then write this try-catch block.
+        try {
+            Field mFieldPopup=popup.getClass().getDeclaredField("mPopup");
+            mFieldPopup.setAccessible(true);
+            MenuPopupHelper mPopup = (MenuPopupHelper) mFieldPopup.get(popup);
+        } catch (Exception e) {
+            Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+        }
+        popup.show();
+        return true;
     }
 
     @Override
@@ -100,7 +139,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         return appDataModels.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private AppCompatImageView img_actor;
         private AppCompatTextView tv_actorname, tv_actorcountry, tv_actordateofbirth, tv_actorgender;
         private LinearLayout main;
@@ -115,16 +155,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
             main = itemView.findViewById(R.id.main);
 
-            itemView.setOnCreateContextMenuListener(this);
 
         }
 
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.setHeaderTitle("Select The Action");
-            menu.add(0, v.getId(), 0, "Call");//groupId, itemId, order, title
-            menu.add(0, v.getId(), 0, "SMS");
 
-        }
     }
 }

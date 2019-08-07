@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.MainActivity">
+
+    <item
+        android:id="@+id/unin"
+        android:orderInCategory="200"
+        android:title="Uninstall"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/info"
+        android:orderInCategory="201"
+        android:title="App Info"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/home"
+        android:orderInCategory="202"
+        android:title="Add to Home Screen"
+        app:showAsAction="ifRoom" />
+</menu>
