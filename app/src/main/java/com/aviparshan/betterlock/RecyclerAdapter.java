@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.aviparshan.betterlock.datamodel.AppDataModel;
+import com.aviparshan.betterlock.utils.HelperClass;
 import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
@@ -37,7 +38,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         void itemDetailLongClick(AppDataModel conversion);
     }
 
-    public RecyclerAdapter(Context context, List<AppDataModel> appDataModels, onItemClickListener listener, onItemLongClickListener listenerLong) {
+     RecyclerAdapter(Context context, List<AppDataModel> appDataModels, onItemClickListener listener, onItemLongClickListener listenerLong) {
         this.context = context;
         this.appDataModels = appDataModels;
         this.listener = listener;
@@ -49,14 +50,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(context).inflate(R.layout.list_item, viewGroup, false);
 //        View view = LayoutInflater.from(context).inflate(R.layout.grid_list_item, viewGroup, false);
-
         return new ViewHolder(view);
     }
-
-//    public void modifyItem(final int position, final Model model) {
-//        mainModel.set(position, model);
-//        notifyItemChanged(position);
-//    }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
@@ -64,10 +59,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         appDataModel = appDataModels.get(i);
         viewHolder.tv_actorname.setText(appDataModel.getTitle());
         viewHolder.tv_actorcountry.setText(appDataModel.getDescription());
-        viewHolder.tv_actorgender.setText(appDataModel.getVersion());
-        viewHolder.tv_actordateofbirth.setText(appDataModel.getPackageName());
+        viewHolder.tv_actorgender.setText(Main.versionChecker(appDataModel));
+        viewHolder.tv_actordateofbirth.setText(Main.packageInstalled(appDataModel));
         String url = appDataModel.getIcon();
-
 
         Picasso.with(context)
                 .load(url)
@@ -75,6 +69,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 .error(R.drawable.ic_android_black_24dp)
 //                .priority(Picasso.Priority.HIGH)
 //                .centerCrop()
+//Picasso.get().load("file:///android_asset/DvpvklR.png").into(imageView2);
                 .resize(200, 200)
                 .into(viewHolder.img_actor);
 
@@ -98,7 +93,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         });
     }
 
-    boolean pop(View v, final int position)
+    private boolean pop(View v, final int position)
     {
         PopupMenu popup = new PopupMenu(v.getContext(), v);
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -112,6 +107,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         Main.appInfo(appDataModels.get(position));
                         return true;
                     case R.id.home:
+//                        HelperClass.addShortcut(context, appDataModel);
+                        HelperClass.addShortcutToHomeScreen(context, appDataModel);
                         return true;
                     default:
                         return false;
@@ -140,12 +137,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         private AppCompatImageView img_actor;
         private AppCompatTextView tv_actorname, tv_actorcountry, tv_actordateofbirth, tv_actorgender;
         private LinearLayout main;
 
-        public ViewHolder(@NonNull View itemView) {
+         ViewHolder(@NonNull View itemView) {
             super(itemView);
             img_actor = itemView.findViewById(R.id.img_actorimage);
             tv_actorname = itemView.findViewById(R.id.tv_actorname);
@@ -154,10 +151,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             tv_actorgender = itemView.findViewById(R.id.tv_actorgender);
 
             main = itemView.findViewById(R.id.main);
-
-
         }
-
-
     }
 }

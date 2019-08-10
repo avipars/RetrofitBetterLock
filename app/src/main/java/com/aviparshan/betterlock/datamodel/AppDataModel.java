@@ -28,6 +28,8 @@ public class AppDataModel {
     @SerializedName("icon")
     @Expose
     private String icon;
+    private boolean installed;
+
 
     public AppDataModel(String title, String packageName, String activity, String version, String description, String icon) {
         this.title = title;
@@ -84,5 +86,13 @@ public class AppDataModel {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public boolean getInstalled() {
+        return installed;
+    }
+
+    public void setInstalled(boolean installed) {
+        this.installed = installed;
     }
 }

@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_margin="4dp"
+                android:layout_margin="2dp"
                 android:text="name"
                 android:textAlignment="viewStart"
                 android:textSize="22sp" />
@@ -37,7 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_margin="5dp"
+                android:layout_margin="2dp"
                 android:text="country"
                 android:textAlignment="viewStart"
                 android:textSize="15sp" />
@@ -47,7 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_margin="5dp"
+                android:layout_margin="2dp"
                 android:text="dob"
                 android:textAlignment="viewStart"
                 android:textSize="15sp" />

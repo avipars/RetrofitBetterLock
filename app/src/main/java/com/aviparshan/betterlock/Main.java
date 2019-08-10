@@ -3,7 +3,9 @@ package com.aviparshan.betterlock;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -61,9 +63,7 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         tool.setTitleTextColor(Color.parseColor("#FFFFFF")); //works perfectly
 
-        mContext = this;
-
-
+        mContext = this; //static intents
 //        int mNoOfColumns = 1;
 //        gridLayoutManager = new GridLayoutManager(Main.this, mNoOfColumns);
 //        recyclerView.setLayoutManager(gridLayoutManager);
@@ -89,7 +89,6 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
                 appDataModels = response.body();
                 recyclerAdapter = new RecyclerAdapter(Main.this, appDataModels, Main.this, Main.this);
                 recyclerView.setAdapter(recyclerAdapter);
-
             }
 
             @Override
@@ -98,7 +97,6 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
                 Log.d("Response", t.getMessage());
             }
         });
-
 
     }
 
@@ -120,15 +118,112 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
 //        return false;
 //    }
 
-    private boolean isPackageInstalled(String paramString, PackageManager paramPackageManager) {
+    public static boolean isPackageInstalled(String paramString, PackageManager paramPackageManager) {
         try {
             paramPackageManager.getPackageInfo(paramString, 0);
             return true;
         } catch (PackageManager.NameNotFoundException nef) {
-            Toast.makeText(this, "Name not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, "Name not found", Toast.LENGTH_SHORT).show();
             return false;
         }
 
+    }
+
+
+    public static String packageInstalled(AppDataModel app)
+    {
+        String pName = app.getPackageName();
+        if(appInstalledOrNot(mContext, pName))
+        {
+            app.setInstalled(true);
+            return "Installed";
+        }
+        else {
+            app.setInstalled(false);
+            return "Not Installed";
+        }
+    }
+
+    public static String versionChecker(AppDataModel app)
+    {
+        if(app.getInstalled()) {
+            if(CompareVersions(app.getVersion(),getVersion(app.getPackageName())) == 0)
+            {
+                return "Updated";
+            }
+            else if(CompareVersions(app.getVersion(),getVersion(app.getPackageName())) == -1)
+            {
+                return "Not Updated";
+            }
+            else
+            {
+                return "Updated";
+            }
+        }
+        else
+        {
+            return "Not Installed";
+        }
+    }
+
+    public static int CompareVersions(String version1, String version2)
+    {
+        String[] string1Vals = version1.split("\\.");
+        String[] string2Vals = version2.split("\\.");
+
+        int length = Math.max(string1Vals.length, string2Vals.length);
+
+        for (int i = 0; i < length; i++)
+        {
+            Integer v1 = (i < string1Vals.length)?Integer.parseInt(string1Vals[i]):0;
+            Integer v2 = (i < string2Vals.length)?Integer.parseInt(string2Vals[i]):0;
+
+            //Making sure Version1 bigger than version2
+            if (v1 > v2)
+            {
+                return 1;
+            }
+            //Making sure Version1 smaller than version2
+            else if(v1 < v2)
+            {
+                return -1;
+            }
+        }
+
+        //Both are equal
+        return 0;
+    }
+
+    public static String getVersion(String packageName)
+    {
+        try {
+            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(packageName, 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            //Handle exception
+            return "0";
+        }
+    }
+
+    public static boolean isPackageInstalled(Context context ,String packageName) {
+        final PackageManager packageManager = context.getPackageManager();
+        Intent intent = packageManager.getLaunchIntentForPackage(packageName);
+        if (intent == null) {
+            return false;
+        }
+        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        return list.size() > 0;
+    }
+
+    public static boolean appInstalledOrNot(Context context, String uri) {
+        PackageManager pm = mContext.getPackageManager();
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e("BetterLock", "Package not installed: " +e);
+        }
+        return false;
     }
 
     @Override
@@ -200,20 +295,22 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
     }
 
     void launchActivity(AppDataModel app) {
-        if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
-            try {
-                Intent intent = new Intent();
-                intent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
-                startActivity(intent);
-            } catch (Exception e) {
-                Toast.makeText(this, e.toString() + " " + app.getPackageName(), Toast.LENGTH_SHORT).show();
-                Log.e("Error Loading", "Error: " + e.toString() + app.getPackageName());
-                app.setVersion("Not installed");
-                recyclerAdapter.notifyDataSetChanged();
+         if(app.getInstalled()) {
+             if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
+                 try {
+                     Intent intent = new Intent();
+                     intent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
+                     startActivity(intent);
+                 } catch (Exception e) {
+                     Toast.makeText(this, e.toString() + " " + app.getPackageName(), Toast.LENGTH_SHORT).show();
+                     Log.e("Error Loading", "Error: " + e.toString() + app.getPackageName());
+                     app.setVersion("Not installed");
+                     recyclerAdapter.notifyDataSetChanged();
 //                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
 //                startActivity(launchIntent);
-            }
-        }
+                 }
+             }
+         }
     }
 
     @Override
