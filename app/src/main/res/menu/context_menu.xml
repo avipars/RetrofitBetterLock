@@ -4,21 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.MainActivity">
 
-    <item
-        android:id="@+id/unin"
-        android:orderInCategory="200"
-        android:title="Uninstall"
-        app:showAsAction="ifRoom" />
+    <group
+        android:id="@+id/gp1"
+        android:orderInCategory="1"
+        android:menuCategory="container"
+        android:title="Group Title"
+        android:visible="true">
 
-    <item
-        android:id="@+id/info"
-        android:orderInCategory="201"
-        android:title="App Info"
-        app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/info"
+            android:orderInCategory="201"
+            android:title="@string/app_info"
+            app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/home"
-        android:orderInCategory="202"
-        android:title="Add to Home Screen"
-        app:showAsAction="ifRoom" />
+        <item
+            android:id="@+id/home"
+            android:orderInCategory="202"
+            android:title="@string/add_to_home_screen"
+            app:showAsAction="ifRoom" />
+
+        <item
+            android:id="@+id/unin"
+            android:orderInCategory="200"
+            android:title="@string/uninstall"
+            app:showAsAction="ifRoom" />
+    </group>
 </menu>

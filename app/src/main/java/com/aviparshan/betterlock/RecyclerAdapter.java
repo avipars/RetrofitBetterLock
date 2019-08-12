@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.aviparshan.betterlock.datamodel.AppDataModel;
-import com.aviparshan.betterlock.utils.HelperClass;
 import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
@@ -59,8 +58,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         appDataModel = appDataModels.get(i);
         viewHolder.tv_actorname.setText(appDataModel.getTitle());
         viewHolder.tv_actorcountry.setText(appDataModel.getDescription());
-        viewHolder.tv_actorgender.setText(Main.versionChecker(appDataModel));
-        viewHolder.tv_actordateofbirth.setText(Main.packageInstalled(appDataModel));
+//        viewHolder.tv_actorgender.setText(Main.versionChecker(appDataModel));
+//        viewHolder.tv_actordateofbirth.setText(Main.packageInstalled(context, appDataModel));
+        viewHolder.tv_actordateofbirth.setText(Main.versionChecker(appDataModel));
+
         String url = appDataModel.getIcon();
 
         Picasso.with(context)
@@ -96,6 +97,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     private boolean pop(View v, final int position)
     {
         PopupMenu popup = new PopupMenu(v.getContext(), v);
+
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -107,8 +109,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         Main.appInfo(appDataModels.get(position));
                         return true;
                     case R.id.home:
-//                        HelperClass.addShortcut(context, appDataModel);
-                        HelperClass.addShortcutToHomeScreen(context, appDataModel);
                         return true;
                     default:
                         return false;
@@ -118,12 +118,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         // here you can inflate your menu
         popup.inflate(R.menu.context_menu);
         popup.setGravity(Gravity.START);
-
         // if you want icon with menu items then write this try-catch block.
         try {
             Field mFieldPopup=popup.getClass().getDeclaredField("mPopup");
             mFieldPopup.setAccessible(true);
             MenuPopupHelper mPopup = (MenuPopupHelper) mFieldPopup.get(popup);
+
+//            Menu menu = popup.getMenu();
+//            MenuItem menuItem = menu.findItem(R.id.gp1);
+//            menuItem.setTitle("Avi Change");
+
         } catch (Exception e) {
             Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
         }
@@ -148,7 +152,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             tv_actorname = itemView.findViewById(R.id.tv_actorname);
             tv_actorcountry = itemView.findViewById(R.id.tv_actorcountry);
             tv_actordateofbirth = itemView.findViewById(R.id.tv_actordob);
-            tv_actorgender = itemView.findViewById(R.id.tv_actorgender);
+//            tv_actorgender = itemView.findViewById(R.id.tv_actorgender);
 
             main = itemView.findViewById(R.id.main);
         }

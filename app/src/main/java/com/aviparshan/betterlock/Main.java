@@ -5,11 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,16 +18,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.aviparshan.betterlock.datamodel.AppDataModel;
+import com.aviparshan.betterlock.utils.HelperClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +45,89 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
     private GridLayoutManager gridLayoutManager;
     private static Context mContext;
 
+    public static String getVersion(String packageName) {
+        try {
+            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(packageName, 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            //Handle exception
+            return "0";
+        }
+    }
+
+    /**
+     * <p>Intent to show an applications details page in (Settings) com.android.settings</p>
+     *
+     * @param model The package name of the application
+     * @return the intent to open the application info screen.
+     */
+    public static void appInfo(AppDataModel model) {
+        String packageName = model.getPackageName();
+        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.setData(Uri.parse("package:" + packageName));
+        mContext.startActivity(intent);
+    }
+
+    /**
+     * Run when user clicks uninstall app if he has a version from put of play store or is using an emulator
+     */
+    public static void uninstallApp(AppDataModel model) {
+        String packageName = model.getPackageName();
+        Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
+        intent.setData(Uri.parse("package:" + packageName));
+        mContext.startActivity(intent);
+    }
+
+    public static boolean isNetworkAvailable(Context mContext) {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    public static boolean isPackageInstalled(String paramString, PackageManager paramPackageManager) {
+        try {
+            paramPackageManager.getPackageInfo(paramString, 0);
+            return true;
+
+        } catch (PackageManager.NameNotFoundException nef) {
+            return false;
+        }
+
+    }
+
+    public static String packageInstalled(Context context, AppDataModel app) {
+        String pName = app.getPackageName();
+        if (appInstalledOrNot(context, pName)) {
+            app.setInstalled(true);
+            return "Installed";
+        } else {
+            app.setInstalled(false);
+            return "Not Installed";
+        }
+    }
+
+    public static String versionChecker(AppDataModel app) {
+
+            if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == 0) {
+                return "Updated";
+            } else if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == -1) {
+                return "Not Updated";
+            } else {
+                return "Newer Version";
+            }
+    }
+
+    private static boolean appInstalledOrNot(Context context, String uri) {
+       PackageManager pm = context.getPackageManager();
+       try {
+           pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+           return true;
+       } catch (PackageManager.NameNotFoundException e) {
+//           Log.e("BetterLock", "Package not installed: " + e);
+       }
+       return false;
+   }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,15 +135,23 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         setContentView(R.layout.main_activity_tool);
 
         AppBarLayout mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        final Toolbar tool = findViewById(R.id.toolbar);
         loadProgress = (ProgressBar) findViewById(R.id.progressBar);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
-        setSupportActionBar(tool);
+
+        CollapsingToolbarLayout ctl = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.z_toolbar);
+        setSupportActionBar(myToolbar);
+
 
         Objects.requireNonNull(getSupportActionBar()).setHomeButtonEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
-        tool.setTitleTextColor(Color.parseColor("#FFFFFF")); //works perfectly
+        ctl.setTitle(getString(R.string.app_name));
+
+        ctl.setCollapsedTitleTextAppearance(R.style.coll_toolbar_title);
+        ctl.setExpandedTitleTextAppearance(R.style.exp_toolbar_title);
+
+//        myToolbar.setTitleTextColor(Color.parseColor("#FFFFFF")); //works perfectly
 
         mContext = this; //static intents
 //        int mNoOfColumns = 1;
@@ -105,126 +195,6 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         startActivity(launchIntent);
     }
 
-//    public boolean isPackageExisted(String targetPackage){
-//        List packages;
-//        PackageManager pm;
-//
-//        pm = getPackageManager();
-//        packages = pm.getInstalledApplications(0);
-//        for (ApplicationInfo packageInfo : packages) {
-//            if(packageInfo.packageName.equals(targetPackage))
-//                return true;
-//        }
-//        return false;
-//    }
-
-    public static boolean isPackageInstalled(String paramString, PackageManager paramPackageManager) {
-        try {
-            paramPackageManager.getPackageInfo(paramString, 0);
-            return true;
-        } catch (PackageManager.NameNotFoundException nef) {
-            Toast.makeText(mContext, "Name not found", Toast.LENGTH_SHORT).show();
-            return false;
-        }
-
-    }
-
-
-    public static String packageInstalled(AppDataModel app)
-    {
-        String pName = app.getPackageName();
-        if(appInstalledOrNot(mContext, pName))
-        {
-            app.setInstalled(true);
-            return "Installed";
-        }
-        else {
-            app.setInstalled(false);
-            return "Not Installed";
-        }
-    }
-
-    public static String versionChecker(AppDataModel app)
-    {
-        if(app.getInstalled()) {
-            if(CompareVersions(app.getVersion(),getVersion(app.getPackageName())) == 0)
-            {
-                return "Updated";
-            }
-            else if(CompareVersions(app.getVersion(),getVersion(app.getPackageName())) == -1)
-            {
-                return "Not Updated";
-            }
-            else
-            {
-                return "Updated";
-            }
-        }
-        else
-        {
-            return "Not Installed";
-        }
-    }
-
-    public static int CompareVersions(String version1, String version2)
-    {
-        String[] string1Vals = version1.split("\\.");
-        String[] string2Vals = version2.split("\\.");
-
-        int length = Math.max(string1Vals.length, string2Vals.length);
-
-        for (int i = 0; i < length; i++)
-        {
-            Integer v1 = (i < string1Vals.length)?Integer.parseInt(string1Vals[i]):0;
-            Integer v2 = (i < string2Vals.length)?Integer.parseInt(string2Vals[i]):0;
-
-            //Making sure Version1 bigger than version2
-            if (v1 > v2)
-            {
-                return 1;
-            }
-            //Making sure Version1 smaller than version2
-            else if(v1 < v2)
-            {
-                return -1;
-            }
-        }
-
-        //Both are equal
-        return 0;
-    }
-
-    public static String getVersion(String packageName)
-    {
-        try {
-            PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(packageName, 0);
-            return packageInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            //Handle exception
-            return "0";
-        }
-    }
-
-    public static boolean isPackageInstalled(Context context ,String packageName) {
-        final PackageManager packageManager = context.getPackageManager();
-        Intent intent = packageManager.getLaunchIntentForPackage(packageName);
-        if (intent == null) {
-            return false;
-        }
-        List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        return list.size() > 0;
-    }
-
-    public static boolean appInstalledOrNot(Context context, String uri) {
-        PackageManager pm = mContext.getPackageManager();
-        try {
-            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e("BetterLock", "Package not installed: " +e);
-        }
-        return false;
-    }
 
     @Override
     public void itemDetailClick(AppDataModel conversion) {
@@ -236,63 +206,6 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
 //        uninstallApp(conversion);
     }
 
-
-    /**
-     * <p>Intent to show an applications details page in (Settings) com.android.settings</p>
-     *
-     * @param model   The package name of the application
-     * @return the intent to open the application info screen.
-     */
-    public static void appInfo(AppDataModel model) {
-        String packageName = model.getPackageName();
-        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setData(Uri.parse("package:" + packageName));
-        mContext.startActivity(intent);
-    }
-
-    /**
-     * Run when user clicks uninstall app if he has a version from put of play store or is using an emulator
-     */
-    public static void deleteApp(AppDataModel model) {
-        String packageName = model.getPackageName();
-        Intent intent = new Intent(Intent.ACTION_DELETE);
-        intent.setData(Uri.parse("package:" + packageName));
-        mContext.startActivity(intent);
-    }
-
-    /**
-     * Run when user clicks uninstall app if he has a version from put of play store or is using an emulator
-     */
-    public static void uninstallApp(AppDataModel model) {
-        String packageName = model.getPackageName();
-        Intent intent = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
-        intent.setData(Uri.parse("package:" + packageName));
-        mContext.startActivity(intent);
-    }
-
-
-    /**
-     * <p>Intent to show an applications details page in (Settings) com.android.settings</p>
-     *
-     * @param packageName   The package name of the application
-     * @return the intent to open the application info screen.
-     */
-    public static void appInfo(String packageName) {
-        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        intent.addCategory(Intent.CATEGORY_DEFAULT);
-        intent.setData(Uri.parse("package:" + packageName));
-        mContext.startActivity(intent);
-    }
-
-    /**
-    * Run when user clicks uninstall app if he has a version from put of play store or is using an emulator
-    */
-     public static void deleteApp(String packageName) {
-        Intent intent = new Intent(Intent.ACTION_DELETE);
-        intent.setData(Uri.parse("package:" + packageName));
-         mContext.startActivity(intent);
-    }
 
     void launchActivity(AppDataModel app) {
          if(app.getInstalled()) {
@@ -311,29 +224,6 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
                  }
              }
          }
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.info:
-                appInfo(this.getPackageName());
-                return true;
-            case R.id.unin:
-                deleteApp(this.getPackageName());
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
     }
 
     @Override

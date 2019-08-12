@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">BetterLock</string>
+    <string name="uninstall">Uninstall</string>
+    <string name="add_to_home_screen">Add to Home Screen</string>
+    <string name="app_info">App Info</string>
+    <string name="version">Version</string>
 </resources>

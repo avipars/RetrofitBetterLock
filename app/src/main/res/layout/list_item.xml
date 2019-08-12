@@ -19,16 +19,17 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:weightSum="3">
 
             <android.support.v7.widget.AppCompatTextView
                 android:id="@+id/tv_actorname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_margin="2dp"
-                android:text="name"
+                android:text="App Title"
+                android:layout_weight="1"
                 android:textAlignment="viewStart"
                 android:textSize="22sp" />
 
@@ -37,8 +38,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_margin="2dp"
-                android:text="country"
+                android:text="App Description"
+                android:layout_weight="1"
                 android:textAlignment="viewStart"
                 android:textSize="15sp" />
 
@@ -47,21 +48,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_margin="2dp"
-                android:text="dob"
+                android:text="App Status"
+                android:layout_weight="1"
                 android:textAlignment="viewStart"
                 android:textSize="15sp" />
-
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/tv_actorgender"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_margin="5dp"
-                android:text="gender"
-                android:textAlignment="viewStart"
-                android:textSize="15sp" />
-
         </LinearLayout>
 
     </LinearLayout>

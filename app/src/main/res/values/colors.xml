@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#448AFF</color>
 
     <color name="colorBlack">#000000</color>
     <color name="colorWhite">#FFFFFF</color>
+
+    <color name="light_gray">#5A5959</color>
+
+
+    <!--easier on the eyes with the white theme-->
+    <!--<color name="colorAccentDay">#4ebaaa</color>-->
+
+    <color name="darkGray">#6c6b6b</color>
+
+
+    <color name="black">#000000</color>
+    <color name="black_alpha_26">#AD000000</color>
+
+
+    <!--Changes SnackBar Default Color, without this it defaults to the theme color-->
+    <color name="design_snackbar_background_color" tools:override="true">@color/colorAccent</color>
 </resources>
