@@ -1,7 +1,14 @@
 
-# Retrofit Sample
+# Better Lock
 
-Retrofit 2 is a HTTP client written in java. It is a type safe library that makes HTTP calls and parses them to java interfaces for you.
+Based on: https://www.wisdomgeek.com/development/android-development/retrofit-2-parsing-json-android/
 
-This is a sample implementation of Retrofit in an android application. For step by step instructions about what is happening, refer to the blog post: https://www.wisdomgeek.com/development/android-development/retrofit-2-parsing-json-android/
+## Uses a json response to fill up the results in the recyclerview
 
+### Goals
+ 
+ * Offline usage
+ 
+ * Show the current version
+ 
+ * Add shortcuts to homescreen
