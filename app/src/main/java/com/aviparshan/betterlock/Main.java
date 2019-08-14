@@ -146,6 +146,7 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         Objects.requireNonNull(getSupportActionBar()).setHomeButtonEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
+
         ctl.setTitle(getString(R.string.app_name));
 
         ctl.setCollapsedTitleTextAppearance(R.style.coll_toolbar_title);
@@ -208,7 +209,6 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
 
 
     void launchActivity(AppDataModel app) {
-         if(app.getInstalled()) {
              if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
                  try {
                      Intent intent = new Intent();
@@ -223,7 +223,7 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
 //                startActivity(launchIntent);
                  }
              }
-         }
+
     }
 
     @Override
