@@ -17,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeAMOLED"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Main">
+        <activity
+            android:name=".Main"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

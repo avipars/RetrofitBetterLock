@@ -1,16 +1,23 @@
 package com.aviparshan.betterlock;
 
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ShortcutInfo;
+import android.content.pm.ShortcutManager;
+import android.graphics.drawable.Icon;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -28,6 +35,7 @@ import com.aviparshan.betterlock.datamodel.AppDataModel;
 import com.aviparshan.betterlock.utils.HelperClass;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -107,39 +115,135 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static void pinAllShortcut(AppDataModel app) {
+        String pName = app.getPackageName();
+        if (appInstalledOrNot(mContext, pName)) {
+            ShortcutManager shortcutManager = mContext.getSystemService(ShortcutManager.class);
+
+//Create a ShortcutInfo object that defines all the shortcut’s characteristics
+
+            Intent appIntent = new Intent();
+            appIntent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
+
+            ShortcutInfo shortcut = new ShortcutInfo.Builder(mContext, app.getPackageName())
+                    .setShortLabel(app.getTitle())
+                    .setLongLabel(app.getDescription())
+                    .setIcon(Icon.createWithResource(mContext, R.mipmap.ic_launcher))
+                    .setIntent(launchIntent(app))
+                    .build();
+
+
+            assert shortcutManager != null;
+            shortcutManager.setDynamicShortcuts(Arrays.asList(shortcut));
+
+//Check that the device's default launcher supports pinned shortcuts//
+
+            if (shortcutManager.isRequestPinShortcutSupported()) {
+                ShortcutInfo pinShortcutInfo = new ShortcutInfo
+                        .Builder(mContext, app.getPackageName())
+                        .build();
+                Intent pinnedShortcutCallbackIntent =
+                        shortcutManager.createShortcutResultIntent(pinShortcutInfo);
+
+//Get notified when a shortcut is pinned successfully//
+
+                PendingIntent successCallback = PendingIntent.getBroadcast(mContext, 0,
+                        pinnedShortcutCallbackIntent, 0);
+                shortcutManager.requestPinShortcut(pinShortcutInfo, successCallback.getIntentSender());
+            }
+        }
+    }
+
     public static String versionChecker(AppDataModel app) {
 
-            if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == 0) {
-                return "Updated";
-            } else if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == -1) {
-                return "Not Updated";
-            } else {
-                return "Newer Version";
-            }
+        if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == 0) {
+            return "Updated";
+        } else if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == -1) {
+            return "Not Updated";
+        } else {
+            return "Newer Version";
+        }
+    }
+
+    public static int versionCheckerColor(AppDataModel app) {
+
+
+        if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == 0) {
+            return ContextCompat.getColor(mContext, R.color.colorAccent);
+
+        } else if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == -1) {
+            return ContextCompat.getColor(mContext, R.color.colorOrange);
+        } else {
+            return ContextCompat.getColor(mContext, R.color.colorAccent);
+        }
     }
 
     private static boolean appInstalledOrNot(Context context, String uri) {
-       PackageManager pm = context.getPackageManager();
-       try {
-           pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-           return true;
-       } catch (PackageManager.NameNotFoundException e) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
 //           Log.e("BetterLock", "Package not installed: " + e);
-       }
-       return false;
-   }
+        }
+        return false;
+    }
+
+    static Intent launchIntent(AppDataModel app) {
+
+//        Intent intent = new Intent();
+//        intent.setAction(Intent.ACTION_VIEW, Uri.parse("https://www.androidauthority.com/"));
+
+        Intent i = new Intent(mContext.getApplicationContext(), Main.class);
+        i.setAction(Intent.ACTION_VIEW);
+
+        if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
+            try {
+                Intent appIntent = new Intent();
+                appIntent.setAction(Intent.ACTION_VIEW);
+                appIntent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
+                return appIntent;
+            } catch (Exception e) {
+                Toast.makeText(mContext, e.toString() + " " + app.getPackageName(), Toast.LENGTH_SHORT).show();
+                Log.e("Error Loading", "Error: " + e.toString() + app.getPackageName());
+//                app.setVersion("Not installed");
+//                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
+//                startActivity(launchIntent);
+                return i;
+            }
+        } else {
+            return i;
+        }
+    }
+
+    void openActivity(int number) {
+        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
+        startActivity(launchIntent);
+    }
+
+
+    @Override
+    public void itemDetailClick(AppDataModel conversion) {
+        launchActivity(conversion);
+    }
+
+    @Override
+    public void itemDetailLongClick(AppDataModel conversion) {
+//        uninstallApp(conversion);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity_tool);
 
-        AppBarLayout mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        loadProgress = (ProgressBar) findViewById(R.id.progressBar);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        AppBarLayout mAppBarLayout = findViewById(R.id.appbar);
+        loadProgress = findViewById(R.id.progressBar);
+        recyclerView = findViewById(R.id.recyclerview);
 
-        CollapsingToolbarLayout ctl = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.z_toolbar);
+        CollapsingToolbarLayout ctl = findViewById(R.id.collapsing_toolbar);
+        Toolbar myToolbar = findViewById(R.id.z_toolbar);
         setSupportActionBar(myToolbar);
 
 
@@ -191,39 +295,21 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
 
     }
 
-    void openActivity(int number) {
-        Intent launchIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
-        startActivity(launchIntent);
-    }
-
-
-    @Override
-    public void itemDetailClick(AppDataModel conversion) {
-        launchActivity(conversion);
-    }
-
-    @Override
-    public void itemDetailLongClick(AppDataModel conversion) {
-//        uninstallApp(conversion);
-    }
-
-
     void launchActivity(AppDataModel app) {
-             if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
-                 try {
-                     Intent intent = new Intent();
-                     intent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
-                     startActivity(intent);
-                 } catch (Exception e) {
-                     Toast.makeText(this, e.toString() + " " + app.getPackageName(), Toast.LENGTH_SHORT).show();
-                     Log.e("Error Loading", "Error: " + e.toString() + app.getPackageName());
-                     app.setVersion("Not installed");
-                     recyclerAdapter.notifyDataSetChanged();
+        if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
+            try {
+                Intent intent = new Intent();
+                intent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
+                startActivity(intent);
+            } catch (Exception e) {
+                Toast.makeText(this, e.toString() + " " + app.getPackageName(), Toast.LENGTH_SHORT).show();
+                Log.e("Error Loading", "Error: " + e.toString() + app.getPackageName());
+                app.setVersion("Not installed");
+                recyclerAdapter.notifyDataSetChanged();
 //                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
 //                startActivity(launchIntent);
-                 }
-             }
-
+            }
+        }
     }
 
     @Override

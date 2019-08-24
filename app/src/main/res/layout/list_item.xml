@@ -18,8 +18,8 @@
             android:src="@android:drawable/ic_dialog_info" />
 
         <LinearLayout
-            android:layout_margin="4dp"
-            android:paddingTop="10dp"
+            android:layout_margin="5dp"
+            android:padding="15dp"
             android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,6 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:text="App Status"
+                android:textColor="@color/colorAccent"
                 android:layout_weight="1"
                 android:textAlignment="viewStart"
                 android:textSize="15sp" />

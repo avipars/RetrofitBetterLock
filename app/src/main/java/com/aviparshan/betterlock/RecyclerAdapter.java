@@ -1,6 +1,7 @@
 package com.aviparshan.betterlock;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.AppCompatImageView;
@@ -62,6 +63,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 //        viewHolder.tv_actordateofbirth.setText(Main.packageInstalled(context, appDataModel));
         viewHolder.tv_actordateofbirth.setText(Main.versionChecker(appDataModel));
 
+        viewHolder.tv_actordateofbirth.setTextColor(Main.versionCheckerColor(appDataModel));
+
+
         String url = appDataModel.getIcon();
 
         Picasso.with(context)
@@ -71,7 +75,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 //                .priority(Picasso.Priority.HIGH)
 //                .centerCrop()
 //Picasso.get().load("file:///android_asset/DvpvklR.png").into(imageView2);
-                .resize(200, 200)
+//                .resize(200, 200)
                 .into(viewHolder.img_actor);
 
         viewHolder.setIsRecyclable(false);
@@ -109,6 +113,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                         Main.appInfo(appDataModels.get(position));
                         return true;
                     case R.id.home:
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            Main.pinAllShortcut(appDataModels.get(position));
+                        }
                         return true;
                     default:
                         return false;
