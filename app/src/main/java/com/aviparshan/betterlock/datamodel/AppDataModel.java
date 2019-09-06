@@ -1,6 +1,8 @@
 package com.aviparshan.betterlock.datamodel;
 
 
+import android.graphics.Bitmap;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -29,7 +31,7 @@ public class AppDataModel {
     @Expose
     private String icon;
     private boolean installed;
-
+    private Bitmap photo;
 
     public AppDataModel(String title, String packageName, String activity, String version, String description, String icon) {
         this.title = title;
@@ -86,6 +88,14 @@ public class AppDataModel {
 
     public void setIcon(String icon) {
         this.icon = icon;
+    }
+
+    public Bitmap getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(Bitmap photo) {
+        this.photo = photo;
     }
 
     public boolean getInstalled() {

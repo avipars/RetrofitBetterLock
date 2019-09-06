@@ -116,38 +116,50 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static void pinAllShortcut(AppDataModel app) {
+    public static void pinShortcut(AppDataModel app) {
         String pName = app.getPackageName();
         if (appInstalledOrNot(mContext, pName)) {
             ShortcutManager shortcutManager = mContext.getSystemService(ShortcutManager.class);
-
-//Create a ShortcutInfo object that defines all the shortcut’s characteristics
+            //Create a ShortcutInfo object that defines all the shortcut’s characteristics
 
             Intent appIntent = new Intent();
             appIntent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
 
-            ShortcutInfo shortcut = new ShortcutInfo.Builder(mContext, app.getPackageName())
-                    .setShortLabel(app.getTitle())
-                    .setLongLabel(app.getDescription())
-                    .setIcon(Icon.createWithResource(mContext, R.mipmap.ic_launcher))
-                    .setIntent(launchIntent(app))
-                    .build();
-
-
+//            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 128, 128, true);
+//                    .setIcon(Icon.createWithResource(mContext,app.getPhoto()))
+//            Bitmap bit;
+//            if (app.getPhoto() == null) {
+//                bit = BitmapFactory.decodeResource(mContext.getResources(),
+//                        R.mipmap.ic_launcher);
+//            } else {
+//                bit = app.getPhoto();
+//            }
+            ShortcutInfo shortcut;
+            if (app.getPhoto() != null) {
+                shortcut = new ShortcutInfo.Builder(mContext, app.getPackageName())
+                        .setShortLabel(app.getTitle())
+                        .setLongLabel(app.getDescription())
+                        .setIcon(Icon.createWithBitmap(app.getPhoto()))
+                        .setIntent(launchIntent(app))
+                        .build();
+            } else {
+                shortcut = new ShortcutInfo.Builder(mContext, app.getPackageName())
+                        .setShortLabel(app.getTitle())
+                        .setLongLabel(app.getDescription())
+                        .setIcon(Icon.createWithResource(mContext, R.mipmap.ic_launcher))
+                        .setIntent(launchIntent(app))
+                        .build();
+            }
             assert shortcutManager != null;
             shortcutManager.setDynamicShortcuts(Arrays.asList(shortcut));
-
-//Check that the device's default launcher supports pinned shortcuts//
-
+            //Check that the device's default launcher supports pinned shortcuts//
             if (shortcutManager.isRequestPinShortcutSupported()) {
                 ShortcutInfo pinShortcutInfo = new ShortcutInfo
                         .Builder(mContext, app.getPackageName())
                         .build();
                 Intent pinnedShortcutCallbackIntent =
                         shortcutManager.createShortcutResultIntent(pinShortcutInfo);
-
-//Get notified when a shortcut is pinned successfully//
-
+                //Get notified when a shortcut is pinned successfully
                 PendingIntent successCallback = PendingIntent.getBroadcast(mContext, 0,
                         pinnedShortcutCallbackIntent, 0);
                 shortcutManager.requestPinShortcut(pinShortcutInfo, successCallback.getIntentSender());
@@ -192,24 +204,18 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
 
     static Intent launchIntent(AppDataModel app) {
 
-//        Intent intent = new Intent();
-//        intent.setAction(Intent.ACTION_VIEW, Uri.parse("https://www.androidauthority.com/"));
-
         Intent i = new Intent(mContext.getApplicationContext(), Main.class);
         i.setAction(Intent.ACTION_VIEW);
-
         if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
             try {
                 Intent appIntent = new Intent();
                 appIntent.setAction(Intent.ACTION_VIEW);
+//                appIntent.setAction(Intent.ACTION_MAIN);
                 appIntent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
                 return appIntent;
             } catch (Exception e) {
                 Toast.makeText(mContext, e.toString() + " " + app.getPackageName(), Toast.LENGTH_SHORT).show();
                 Log.e("Error Loading", "Error: " + e.toString() + app.getPackageName());
-//                app.setVersion("Not installed");
-//                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
-//                startActivity(launchIntent);
                 return i;
             }
         } else {
@@ -330,4 +336,7 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         return true;
     }
 
+    public static void createToast(String message, int duration) {
+        Toast.makeText(mContext, message, duration).show();
+    }
 }

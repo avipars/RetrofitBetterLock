@@ -19,48 +19,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ServiceGenerator {
     private static Retrofit retrofit;
     private static Gson gson;
-
-//    int cacheSize = 10 * 1024 * 1024; // 10 MB
-//    Cache cache = new Cache(this.getCacheDir(), cacheSize);
-//
-//    OkHttpClient okHttpClient = new OkHttpClient.Builder()
-//            .cache(cache)
-//            .build();
-
-//    public static OkHttpClient createCache ()
-//    {
-//        int cacheSize = 10 * 1024 * 1024; // 10 MB
-//        Cache cache = new Cache(getCacheDir(), cacheSize);
-//
-//        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-//                .cache(cache)
-//                .build();
-//        return  okHttpClient;
-//
-//        OkHttpClient client = new OkHttpClient
-//                .Builder()
-//                .cache(new Cache(App.sApp.getCacheDir(), 10 * 1024 * 1024)) // 10 MB
-//                .addInterceptor(new Interceptor() {
-//                    @Override public Response intercept(Chain chain) throws IOException {
-//                        Request request = chain.request();
-//                        if (Main.isNetworkAvailable(this)) {
-//                            request = request.newBuilder().header("Cache-Control", "public, max-age=" + 60).build();
-//                        } else {
-//                            request = request.newBuilder().header("Cache-Control", "public, only-if-cached, max-stale=" + 60 * 60 * 24 * 7).build();
-//                        }
-//                        return chain.proceed(request);
-//                    }
-//                })
-//                .build();
-//    }
-
+    static OkHttpClient okHttpClient;
 
     public static Boolean hasNetwork(Context context) {
         Boolean isConnected = false; // Initial Value
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting())
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
             isConnected = true;
+        }
         return isConnected;
     }
 
@@ -88,15 +55,18 @@ public class ServiceGenerator {
 
         return retrofit;
     }
-    
+
+
     public static Retrofit getRetrofit() {
         gson=new GsonBuilder()
                 .create();
 
         if (retrofit==null){
+
+
             retrofit=new Retrofit.Builder()
                         .baseUrl(CONSTANTS.BASE_URL)
-//                        .client(createCache)
+//                        .client(okHttpClient)
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
         }

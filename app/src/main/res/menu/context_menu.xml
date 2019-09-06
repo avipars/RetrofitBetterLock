@@ -2,27 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.MainActivity">
-
+    tools:context="com.aviparshan.betterlock.Main">
     <group
         android:id="@+id/gp1"
         android:orderInCategory="1"
         android:menuCategory="container"
-        android:title="Group Title"
         android:visible="true">
-
         <item
             android:id="@+id/info"
             android:orderInCategory="201"
             android:title="@string/app_info"
             app:showAsAction="ifRoom" />
-
         <item
             android:id="@+id/home"
             android:orderInCategory="202"
             android:title="@string/add_to_home_screen"
             app:showAsAction="ifRoom" />
-
         <item
             android:id="@+id/unin"
             android:orderInCategory="200"

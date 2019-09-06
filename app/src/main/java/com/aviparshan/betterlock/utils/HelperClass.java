@@ -41,9 +41,10 @@ public class HelperClass extends Application {
             //Making sure Version1 smaller than version2
             else if (v1 < v2) {
                 return -1;
+            } else {
+                return 0;
             }
         }
-
         //Both are equal
         return 0;
     }
