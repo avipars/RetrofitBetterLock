@@ -4,4 +4,10 @@
     <string name="add_to_home_screen">Add to Home Screen</string>
     <string name="app_info">App Info</string>
     <string name="version">Version</string>
+    <string name="sort">Sort</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="updated">Updated</string>
+    <string name="settings">Settings</string>
+    <string name="cache">Clears Cache</string>
 </resources>

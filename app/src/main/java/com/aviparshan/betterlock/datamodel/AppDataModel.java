@@ -33,6 +33,10 @@ public class AppDataModel {
     private boolean installed;
     private Bitmap photo;
 
+    public AppDataModel() {
+        super();
+    }
+
     public AppDataModel(String title, String packageName, String activity, String version, String description, String icon) {
         this.title = title;
         this.packageName = packageName;

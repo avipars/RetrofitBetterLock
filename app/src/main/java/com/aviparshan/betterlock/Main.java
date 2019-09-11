@@ -35,7 +35,8 @@ import com.aviparshan.betterlock.datamodel.AppDataModel;
 import com.aviparshan.betterlock.utils.HelperClass;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -151,7 +152,9 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
                         .build();
             }
             assert shortcutManager != null;
-            shortcutManager.setDynamicShortcuts(Arrays.asList(shortcut));
+
+            shortcutManager.setDynamicShortcuts(Collections.singletonList(shortcut));
+
             //Check that the device's default launcher supports pinned shortcuts//
             if (shortcutManager.isRequestPinShortcutSupported()) {
                 ShortcutInfo pinShortcutInfo = new ShortcutInfo
@@ -168,24 +171,24 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
     }
 
     public static String versionChecker(AppDataModel app) {
-
-        if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == 0) {
+        if (!appInstalledOrNot(mContext, app.getPackageName())) {
+            return "Not Installed";
+        } else if (HelperClass.compareVersionsBetter(getVersion(app.getPackageName()), app.getVersion()) == -1) {
+            return "Update Available";
+        } else if (HelperClass.compareVersionsBetter(getVersion(app.getPackageName()), app.getVersion()) == 0) {
             return "Updated";
-        } else if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == -1) {
-            return "Not Updated";
         } else {
-            return "Newer Version";
+            return "";
         }
     }
 
     public static int versionCheckerColor(AppDataModel app) {
-
-
-        if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == 0) {
-            return ContextCompat.getColor(mContext, R.color.colorAccent);
-
-        } else if (HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())) == -1) {
+        if (!appInstalledOrNot(mContext, app.getPackageName())) {
+            return ContextCompat.getColor(mContext, R.color.colorRed);
+        } else if (HelperClass.compareVersionsBetter(getVersion(app.getPackageName()), app.getVersion()) == -1) {
             return ContextCompat.getColor(mContext, R.color.colorOrange);
+        } else if (HelperClass.compareVersionsBetter(getVersion(app.getPackageName()), app.getVersion()) == 0) {
+            return ContextCompat.getColor(mContext, R.color.colorAccent);
         } else {
             return ContextCompat.getColor(mContext, R.color.colorAccent);
         }
@@ -198,12 +201,11 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
             return true;
         } catch (PackageManager.NameNotFoundException e) {
 //           Log.e("BetterLock", "Package not installed: " + e);
+            return false;
         }
-        return false;
     }
 
     static Intent launchIntent(AppDataModel app) {
-
         Intent i = new Intent(mContext.getApplicationContext(), Main.class);
         i.setAction(Intent.ACTION_VIEW);
         if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
@@ -228,7 +230,6 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         startActivity(launchIntent);
     }
 
-
     @Override
     public void itemDetailClick(AppDataModel conversion) {
         launchActivity(conversion);
@@ -251,7 +252,6 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         CollapsingToolbarLayout ctl = findViewById(R.id.collapsing_toolbar);
         Toolbar myToolbar = findViewById(R.id.z_toolbar);
         setSupportActionBar(myToolbar);
-
 
         Objects.requireNonNull(getSupportActionBar()).setHomeButtonEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -280,7 +280,12 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setNestedScrollingEnabled(true);
 
-        APIInterface service = ServiceGenerator.getRetrofit().create(APIInterface.class);
+        APIInterface service;
+        if (ServiceGenerator.isConnected()) {
+            service = ServiceGenerator.getRetrofit().create(APIInterface.class);
+        } else {
+            service = ServiceGenerator.getCacheEnabledRetrofit(this).create(APIInterface.class);
+        }
 
         Call<List<AppDataModel>> call = service.getAppList();
         call.enqueue(new Callback<List<AppDataModel>>() {
@@ -298,23 +303,72 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
                 Log.d("Response", t.getMessage());
             }
         });
-
     }
 
     void launchActivity(AppDataModel app) {
-        if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
-            try {
-                Intent intent = new Intent();
-                intent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
-                startActivity(intent);
-            } catch (Exception e) {
-                Toast.makeText(this, e.toString() + " " + app.getPackageName(), Toast.LENGTH_SHORT).show();
-                Log.e("Error Loading", "Error: " + e.toString() + app.getPackageName());
-                app.setVersion("Not installed");
-                recyclerAdapter.notifyDataSetChanged();
+        if (appInstalledOrNot(mContext, app.getPackageName())) {
+            if (!app.getActivity().isEmpty() && !app.getPackageName().isEmpty()) {
+                try {
+                    Intent intent = new Intent();
+                    intent.setComponent(new ComponentName(app.getPackageName(), app.getActivity()));
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(this, e.toString() + " " + app.getPackageName(), Toast.LENGTH_SHORT).show();
+                    Log.e("Error Loading", "Error: " + e.toString() + app.getPackageName());
+                    app.setVersion("Not installed");
+                    recyclerAdapter.notifyDataSetChanged();
 //                Intent launchIntent = getPackageManager().getLaunchIntentForPackage(app.getPackageName());
 //                startActivity(launchIntent);
+                }
             }
+        }
+//        else
+//        {
+//            Log.d("Version: ", "" + HelperClass.CompareVersions(app.getVersion(), getVersion(app.getPackageName())));
+//        }
+    }
+
+    private void sortArrayList(int type) {
+//        App.setSortPref(this, type);
+        if (recyclerAdapter != null) {
+            if (type == 0) {
+                Collections.sort(appDataModels, new Comparator<AppDataModel>() {
+                    @Override
+                    public int compare(AppDataModel o1, AppDataModel o2) {
+                        String name1 = o1.getTitle();
+                        String name2 = o2.getTitle();
+                        return name1.compareTo(name2);
+                    }
+                });
+            } else if (type == 1) {
+                Collections.sort(appDataModels, new Comparator<AppDataModel>() {
+                    @Override
+                    public int compare(AppDataModel o1, AppDataModel o2) {
+                        String name1 = o1.getTitle();
+                        String name2 = o2.getTitle();
+                        return name2.compareTo(name1);
+                    }
+                });
+            } else if (type == 2) {
+                //TODO: Sort by versions maybe
+                Collections.sort(appDataModels, new Comparator<AppDataModel>() {
+                    @Override
+                    public int compare(AppDataModel o1, AppDataModel o2) {
+                        boolean installed1 = appInstalledOrNot(mContext, o1.getPackageName());
+                        boolean installed2 = appInstalledOrNot(mContext, o2.getPackageName());
+                        if (installed1 && !installed2) {
+                            return 1;
+                        } else if (!installed1 && installed2) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+
+//                        return Boolean.compare(installed1, installed2);
+                    }
+                });
+            }
+            recyclerAdapter.notifyDataSetChanged();
         }
     }
 
@@ -322,7 +376,20 @@ public class Main extends AppCompatActivity implements RecyclerAdapter.onItemCli
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.settings:
+            case R.id.cache:
+                ServiceGenerator.clean();
+                recyclerAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.action_sort:
+                return true;
+            case R.id.descend:
+                sortArrayList(1);
+                return true;
+            case R.id.ascend:
+                sortArrayList(0);
+                return true;
+            case R.id.type:
+                sortArrayList(2);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

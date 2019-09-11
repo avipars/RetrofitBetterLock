@@ -12,6 +12,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,34 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     boolean imageSet = false;
     Bitmap b;
     private Target mTarget;
+
+    private Target returnTarget(final ViewHolder viewHolder) {
+        mTarget = new Target() {
+            @Override
+            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
+//                BitmapDrawable mBitmapDrawable = new BitmapDrawable(getResources(), bitmap);
+                b = bitmap;
+                appDataModel.setPhoto(b);
+                viewHolder.img_actor.setImageBitmap(b);
+                imageSet = true;
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+                b = ((BitmapDrawable) errorDrawable).getBitmap();
+                appDataModel.setPhoto(b);
+                imageSet = false;
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+//                b = ((BitmapDrawable) placeHolderDrawable).getBitmap();
+//                appDataModel.setPhoto(b);
+                imageSet = false;
+            }
+        };
+        return mTarget;
+    }
 
     public interface onItemClickListener {
         void itemDetailClick(AppDataModel conversion);
@@ -82,37 +111,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 ////                .resize(200, 200)
 //                .into(viewHolder.img_actor);
 
-        mTarget = new Target() {
-            @Override
-            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-                b = bitmap;
-                appDataModel.setPhoto(bitmap);
-                viewHolder.img_actor.setImageBitmap(bitmap);
-                imageSet = true;
-
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-                b = ((BitmapDrawable) errorDrawable).getBitmap();
-                appDataModel.setPhoto(b);
-                imageSet = false;
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-//                b = ((BitmapDrawable) placeHolderDrawable).getBitmap();
-//                appDataModel.setPhoto(b);
-                imageSet = false;
-            }
-        };
-
         Picasso.with(context)
                 .load(url)
+                .resize(400, 400)
+                .centerCrop()
+                .priority(Picasso.Priority.HIGH)
                 .error(R.drawable.ic_android_black_24dp)
-                .noPlaceholder()
-//                .header("Cache-Control", String.format("max-age=%d", 50000))
-                .into(mTarget);
+//                .noPlaceholder()
+                .into(returnTarget(viewHolder));
 
         viewHolder.setIsRecyclable(false);
 
@@ -136,7 +142,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
     private boolean pop(View v, final int position) {
         PopupMenu popup = new PopupMenu(v.getContext(), v);
-
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -159,8 +164,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                 }
             }
         });
-
-        popup.getMenu().add("Version: " + appDataModel.getVersion());
+        popup.getMenu().add("Copy Information to Keyboard");
         popup.show();
         // here you can inflate your menu
         popup.inflate(R.menu.context_menu);
@@ -170,9 +174,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             Field mFieldPopup = popup.getClass().getDeclaredField("mPopup");
             mFieldPopup.setAccessible(true);
             MenuPopupHelper mPopup = (MenuPopupHelper) mFieldPopup.get(popup);
-
-//            Menu menu = popup.getMenu();
-//            MenuItem menuItem = menu.findItem(R.id.gp1);
+            Menu menu = popup.getMenu();
+            MenuItem menuItem = menu.findItem(R.id.gp1);
 //            menuItem.setTitle("Avi Change");
         } catch (Exception e) {
             Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
@@ -201,4 +204,5 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             main = itemView.findViewById(R.id.main);
         }
     }
+
 }

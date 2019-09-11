@@ -2,11 +2,36 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.MainActivity">
-
+    tools:context="com.aviparshan.betterlock.Main">
+    <item
+        android:id="@+id/action_sort"
+        android:icon="@drawable/ic_sort"
+        android:orderInCategory="99"
+        android:title="@string/sort"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/ascend"
+                android:title="@string/ascending"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/descend"
+                android:title="@string/descending"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/type"
+                android:title="@string/updated"
+                app:showAsAction="never" />
+        </menu>
+    </item>
     <item
         android:id="@+id/settings"
         android:orderInCategory="100"
-        android:title="Settings"
+        android:title="@string/settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/cache"
+        android:orderInCategory="101"
+        android:title="@string/cache"
+        app:showAsAction="never"></item>
 </menu>
