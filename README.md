@@ -12,3 +12,6 @@ Based on: https://www.wisdomgeek.com/development/android-development/retrofit-2-
  * Show the current version
  
  * Add shortcuts to homescreen
+
+
+https://github.com/avipars/BetterLock
