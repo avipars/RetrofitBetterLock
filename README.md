@@ -15,3 +15,7 @@ Based on: https://www.wisdomgeek.com/development/android-development/retrofit-2-
 
 
 https://github.com/avipars/BetterLock
+
+
+No longer maintained as Good Lock is no longer Geo-Location Blocking...
+
